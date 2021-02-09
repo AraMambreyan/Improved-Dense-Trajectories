@@ -72,7 +72,8 @@ These two lines simply print the raw features of a single trajectory.
 ## Running
 
 After the setup and choosing which mode you'd like to run by assigning appropriate boolean variables, you need
-to create a Docker image from the `Dockerfile`:
+to create a Docker image from the `Dockerfile`. Make sure you are in the repository's directory 
+and run:
 
 ```
 docker build -t idt .
@@ -93,7 +94,7 @@ docker run -v %cd%\features:/densetrack/features idt
 I didn't test for Windows so if it doesn't work simply replace `%cd%\features` with the path of the `features`
 directory.
 
-That's it! 
+That's it! Your features are now in the (wait for it) `features` directory.
 
 #### Clean Up
 
