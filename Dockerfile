@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-# parts of the Dockerfile where adapted from unikrn/python-opencv
+# parts of the Dockerfile were adapted from unikrn/python-opencv
 
 RUN echo 'deb http://security.ubuntu.com/ubuntu focal-security main' >> /etc/apt/sources.list
 RUN echo 'deb http://security.ubuntu.com/ubuntu xenial-security main' >> /etc/apt/sources.list

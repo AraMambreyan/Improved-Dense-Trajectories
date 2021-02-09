@@ -8,6 +8,8 @@ import pandas as pd
 import densetrack
 
 
+# Choose which descriptors you would like to run. If all are set to False,
+# raw IDT features will be outputted.
 HOG_FISHER_VECTOR = True
 HOF_FISHER_VECTOR = True
 MBH_FISHER_VECTOR = True
