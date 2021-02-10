@@ -159,11 +159,57 @@ def fisher_descriptor(descriptor):
     return fisher_vector(descriptor_pca, gmm)
 
 
+def add_row_to_table(data_frame, name, features):
+    """
+    Adds a row to the data frame.
+
+    If empty, creates the data frame. Otherwise, add name of the video and
+    corresponding descriptor's features.
+
+    :param data_frame: The data frame of a descriptor (HOG/HOF/MBH).
+    :type data_frame: DataFrame
+
+    :param name: the name of the video.
+    :type name: String
+
+    :param features: the features of a descriptor (HOG/HOF/MBH)
+    :type features: array_like, shape (D, ) where D is the dimension of the
+                    descriptor.
+
+    :return: DataFrame with the new row appended.
+    :rtype: DataFrame
+    """
+    if data_frame.empty:
+        data_frame = pd.DataFrame(columns=['name'] + [str(i) for i in
+                                                      range(len(features))])
+    data_frame = data_frame.append(pd.Series(
+        [name] + list(features), index=data_frame.columns), ignore_index=True)
+
+    return data_frame
+
+
+def save_as_csv(data_frame, path):
+    """
+    Creates a CSV file from a data frame and does nothing if frame is empty.
+
+    :param data_frame: The final data frame of a descriptor (HOG/HOG/MBH) for
+                       all videos.
+    :type data_frame: DataFrame
+
+    :param path: The path to write the DataFrame to.
+    :type path: String
+    """
+    if not data_frame.empty:
+        data_frame.to_csv(path)
+
+
 def main():
     if not os.listdir(DATA_DIRECTORY):
         print('No input video files are present. Please put your files in the '
               '"data" directory, rebuild the image and run the container.')
     else:
+        hog_df, hof_df, mbh_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
+
         for i, file in enumerate(os.listdir(DATA_DIRECTORY)):
             video = read_video(file)
             print('------------------------------------------')
@@ -181,27 +227,35 @@ def main():
                 if HOG_FISHER_VECTOR:
                     hog_descriptors = read_hog(tracks)
                     hog_fv = fisher_descriptor(hog_descriptors)
-                    np.save(os.path.join(TARGET_DIRECTORY, name
-                                         + '-hog_fv'), hog_fv)
+                    # np.save(os.path.join(TARGET_DIRECTORY, name
+                    #                      + '-hog_fv'), hog_fv)
+                    hog_df = add_row_to_table(hog_df, name, hog_fv)
                 if HOF_FISHER_VECTOR:
                     hof_descriptors = read_hof(tracks)
                     hof_fv = fisher_descriptor(hof_descriptors)
-                    np.save(os.path.join(TARGET_DIRECTORY, name
-                                         + '-hof_fv'), hof_fv)
+                    # np.save(os.path.join(TARGET_DIRECTORY, name
+                    #                      + '-hof_fv'), hof_fv)
+                    hof_df = add_row_to_table(hof_df, name, hof_fv)
+
                 if MBH_FISHER_VECTOR:
                     mbh_x_descriptors, mbh_y_descriptors = read_mbh(tracks)
                     mbh_x_fv = fisher_descriptor(mbh_x_descriptors)
                     mbh_y_fv = fisher_descriptor(mbh_y_descriptors)
 
                     mbh_fv = np.concatenate((mbh_x_fv, mbh_y_fv))
-                    np.save(os.path.join(TARGET_DIRECTORY, name
-                                         + '-mbh_fv'), mbh_fv)
+                    # np.save(os.path.join(TARGET_DIRECTORY, name
+                    #                      + '-mbh_fv'), mbh_fv)
+                    mbh_df = add_row_to_table(mbh_df, name, mbh_fv)
 
                 del tracks
 
             print(f'Completed {file}')
             if (i+1) % 10 == 0:
                 print(f'{i+1} files were completed.')
+
+        save_as_csv(hog_df, 'features/hog_features.csv')
+        save_as_csv(hof_df, 'features/hof_features.csv')
+        save_as_csv(mbh_df, 'features/mbh_features.csv')
 
 
 if __name__ == '__main__':

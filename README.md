@@ -27,8 +27,6 @@ git clone https://github.com/AraMambreyan/Improved-Dense-Trajectories.git
 cd Improved-Dense-Trajectories
 ```
 
-Put all your video files in the `data` directory. 
-
 ## Modes
 
 The code can be run in two modes:
@@ -37,7 +35,8 @@ The code can be run in two modes:
 
 In this mode, a Fisher Vector encoding is applied. For each descriptor (HOG/HOF/MBH), a separate
 *csv* file will be outputted in the `features` directory. Each row of the *csv* file is 
-the Fisher Vector of one video from the `data` directory.
+the Fisher Vector of one video from the `data` directory. An example video is provided
+in the `data` directory along with *csv* files in the `features` directory.
 
 You can disable the descriptors that you don't want to run by assigning a `False` value to the
 accompanying variables at the top of the `run_idt.py` script. For instance, the below will 
@@ -71,9 +70,9 @@ These two lines simply print the raw features of a single trajectory.
 
 ## Running
 
-After the setup and choosing which mode you'd like to run by assigning appropriate boolean variables, you need
-to create a Docker image from the `Dockerfile`. Make sure you are in the repository's directory 
-and run:
+After the setup and choosing which mode you'd like to run by assigning appropriate boolean variables, 
+put your input video files in the `data` directory. Then, make sure you are in the repository's directory 
+and create a Docker image:
 
 ```
 docker build -t idt .
