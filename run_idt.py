@@ -4,20 +4,20 @@ import cv2
 from sklearn.mixture import GaussianMixture as GMM
 from sklearn.decomposition import PCA
 import pandas as pd
+import re
 
 import densetrack
 
-
 # Choose which descriptors you would like to run. If all are set to False,
 # raw IDT features will be outputted.
-HOG_FISHER_VECTOR = True
-HOF_FISHER_VECTOR = True
+HOG_FISHER_VECTOR = False
+HOF_FISHER_VECTOR = False
 MBH_FISHER_VECTOR = True
 
 DATA_DIRECTORY = 'data'  # the directory of the input video files
 TARGET_DIRECTORY = 'features'  # targets will be put in this directory
 
-K = 256  # GMM components for the Fisher Vector
+K = 128  # GMM components for the Fisher Vector
 
 
 def read_video(file):
@@ -202,6 +202,16 @@ def save_as_csv(data_frame, path):
     if not data_frame.empty:
         data_frame.to_csv(path)
 
+def sorted_alphanumeric(data):
+    """
+    Sorts alphanumerically.
+
+    :param data: data to be sorted e.g. a list
+    :return: sorted data alphanumerically e.g. "User_2" before "User_10"
+    """
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ]
+    return sorted(data, key=alphanum_key)
 
 def main():
     if not os.listdir(DATA_DIRECTORY):
@@ -210,7 +220,7 @@ def main():
     else:
         hog_df, hof_df, mbh_df = pd.DataFrame(), pd.DataFrame(), pd.DataFrame()
 
-        for i, file in enumerate(os.listdir(DATA_DIRECTORY)):
+        for i, file in enumerate(sorted_alphanumeric(os.listdir(DATA_DIRECTORY))):
             video = read_video(file)
             print('------------------------------------------')
             print(f'Running: {file} of shape {video.shape}')
@@ -253,9 +263,9 @@ def main():
             if (i+1) % 10 == 0:
                 print(f'{i+1} files were completed.')
 
-        save_as_csv(hog_df, 'features/hog_features.csv')
-        save_as_csv(hof_df, 'features/hof_features.csv')
-        save_as_csv(mbh_df, 'features/mbh_features.csv')
+            save_as_csv(hog_df, 'features/hog_features.csv')
+            save_as_csv(hof_df, 'features/hof_features.csv')
+            save_as_csv(mbh_df, 'features/mbh_features.csv')
 
 
 if __name__ == '__main__':
