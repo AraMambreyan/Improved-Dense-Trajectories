@@ -69,6 +69,6 @@ RUN pip3 install scikit-learn pandas
 
 WORKDIR densetrack
 COPY . .
-RUN pip3 install --upgrade numpy
+RUN pip3 install numpy==1.21
 RUN python3 setup.py install
 ENTRYPOINT python3 -u run_idt.py
